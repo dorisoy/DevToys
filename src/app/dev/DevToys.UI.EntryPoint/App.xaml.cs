@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.ApplicationModel.Core;
+using Windows.ApplicationModel.Resources;
 
 #if WINDOWS_UWP
 #nullable enable
@@ -25,8 +26,6 @@ namespace DevToys;
 /// </summary>
 public sealed partial class App : Application
 {
-    private Window? _window;
-
     /// <summary>
     /// Initializes the singleton application object.  This is the first line of authored code
     /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -35,16 +34,17 @@ public sealed partial class App : Application
     {
         InitializeLogging();
 
-        // Set the language of the app for startup. By default, it's the same than Windows, or english.
-        // The language defined by the user will be applied later, once MEF is loaded, but before the UI shows up.
-        LanguageManager.Instance.SetCurrentCulture(LanguageManager.Instance.AvailableLanguages[0]);
-
         this.InitializeComponent();
 
 #if HAS_UNO || NETFX_CORE
         this.Suspending += OnSuspending;
 #endif
     }
+
+    /// <summary>
+    /// Gets the main window of the app.
+    /// </summary>
+    internal static Window? MainWindow { get; private set; }
 
     /// <summary>
     /// Invoked when the application is launched normally by the end user.  Other entry points
@@ -60,15 +60,22 @@ public sealed partial class App : Application
         }
 #endif
 
+        // UNO ISSUE => this line would crash if moved to line 37.
+        LanguageManager.Instance.SetCurrentCulture(LanguageManager.Instance.AvailableLanguages[0]);
+
+        // UNO ISSUE => It returns an empty string?
+        var resourceLoader = ResourceLoader.GetForViewIndependentUse("DevToys.UI/Languages");
+        var localizedText = resourceLoader.GetString("DefaultLanguage");
+
 #if NET6_0_OR_GREATER && WINDOWS && !HAS_UNO
-        _window = new Window();
-        _window.Activate();
+        MainWindow = new Window();
+        MainWindow.Activate();
 #elif __MAC__
         // Important! Keep the full name `Microsoft.UI.Xaml.Window.Current` otherwise the Mac app won't build.
         // See https://blog.mzikmund.com/2020/04/resolving-uno-platform-uiwindow-does-not-contain-a-definition-for-current-issue/
-        _window = Microsoft.UI.Xaml.Window.Current;
+        MainWindow = Microsoft.UI.Xaml.Window.Current;
 #else
-        _window = Window.Current;
+        MainWindow = Window.Current;
 #endif
 
 #if WINDOWS_UWP
@@ -79,7 +86,7 @@ public sealed partial class App : Application
 
         // Do not repeat app initialization when the Window already has content,
         // just ensure that the window is active
-        if (_window.Content is not Frame rootFrame)
+        if (MainWindow.Content is not Frame rootFrame)
         {
             // Create a Frame to act as the navigation context and navigate to the first page
             rootFrame = new Frame();
@@ -92,7 +99,7 @@ public sealed partial class App : Application
             }
 
             // Place the frame in the current Window
-            _window.Content = rootFrame;
+            MainWindow.Content = rootFrame;
         }
 
 #if !(NET6_0_OR_GREATER && WINDOWS)
@@ -112,7 +119,7 @@ public sealed partial class App : Application
                 rootFrame.Navigate(typeof(MainPage), args.Arguments);
             }
             // Ensure the current window is active
-            _window.Activate();
+            MainWindow.Activate();
         }
     }
 

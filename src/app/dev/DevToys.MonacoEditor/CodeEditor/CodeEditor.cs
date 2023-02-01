@@ -59,7 +59,8 @@ public sealed partial class CodeEditor : Control, IParentAccessorAcceptor, IDisp
     {
         DefaultStyleKey = typeof(CodeEditor);
 
-        UIAccess.ThrowIfNotOnUIThread();
+        // UNO ISSUE => Is it expected to be suddenly created off the UI thread?
+        //UIAccess.ThrowIfNotOnUIThread();
 
         ParentAccessor = new ParentAccessor(this);
         ParentAccessor.AddAssemblyForTypeLookup(typeof(Range).GetTypeInfo().Assembly);
