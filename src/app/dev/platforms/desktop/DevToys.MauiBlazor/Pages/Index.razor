@@ -1,20 +1,28 @@
 ﻿@page "/"
 @page "/{Name}"
 
+@using DevToys.Api;
+@using DevToys.Business.ViewModels;
+@using DevToys.Core.Tools;
+@using DevToys.Core.Tools.ViewItems;
+@using DevToys.MauiBlazor.Components.GuiTool;
 @using Microsoft.Fast.Components.FluentUI
 @using System.Web;
 
 <h1>@Name - (@EncodedName)</h1>
 
+<UIElementPresenter UIElement="@UIElement" />
 
-@functions {
+@code {
+    [Inject]
+    internal IMefProvider MefProvider { get; set; } = default!;
 
     private string _name = string.Empty;
     private string _encodedName = string.Empty;
 
     public string EncodedName
     {
-        get => _encodedName; 
+        get => _encodedName;
         set
         {
             if (string.IsNullOrWhiteSpace(value))
@@ -28,8 +36,9 @@
 
     // Define a property to contain the parameter passed from the auth page
     [Parameter]
-    public string Name { 
-        get => _name; 
+    public string Name
+    {
+        get => _name;
         set
         {
             if (string.IsNullOrWhiteSpace(value))
@@ -42,5 +51,24 @@
             EncodedName = value;
             _name = HttpUtility.UrlDecode(value);
         }
+    }
+
+    public IUIElement? UIElement { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        var guiToolProvider = MefProvider.Import<GuiToolProvider>();
+        var viewItem = guiToolProvider.GetViewItemFromInternalComponentName(Name);
+
+        if (viewItem is GuiToolViewItem guiToolViewItem)
+        {
+            UIElement = guiToolViewItem.ToolInstance.View;
+        }
+        else if (viewItem is GroupViewItem groupViewItem)
+        {
+            // TODO.
+        }
+
+        base.OnParametersSet();
     }
 }

@@ -210,8 +210,7 @@ internal sealed partial class MainWindowViewModel : ObservableRecipient
                 for (int i = 0; i < detectedTools.Count; i++)
                 {
                     SmartDetectedTool detectedTool = detectedTools[i];
-                    IEnumerable<GuiToolViewItem> toolViewItems = _guiToolProvider.GetViewItemFromTool(detectedTool.ToolInstance);
-                    GuiToolViewItem? toolViewItem = toolViewItems.FirstOrDefault();
+                    GuiToolViewItem? toolViewItem = _guiToolProvider.GetViewItemFromTool(detectedTool.ToolInstance);
                     if (toolViewItem != null)
                     {
                         if (i == 0)
@@ -304,7 +303,7 @@ internal sealed partial class MainWindowViewModel : ObservableRecipient
 
         if (guiToolInstance is not null)
         {
-            GuiToolViewItem? itemToSelect = _guiToolProvider.GetViewItemFromTool(guiToolInstance).FirstOrDefault();
+            GuiToolViewItem? itemToSelect = _guiToolProvider.GetViewItemFromTool(guiToolInstance);
             if (itemToSelect is not null)
             {
                 return itemToSelect;

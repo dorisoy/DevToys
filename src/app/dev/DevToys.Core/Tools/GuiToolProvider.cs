@@ -42,6 +42,7 @@ public sealed partial class GuiToolProvider
     private readonly ISettingsProvider _settingsProvider;
     private readonly IReadOnlyList<GuiToolInstance> _footerToolInstances;
     private readonly IReadOnlyList<GuiToolInstance> _bodyToolInstances;
+    private readonly Dictionary<string, INotifyPropertyChanged> _internalComponentNameToViewItemMap;
 
     private ObservableCollection<INotifyPropertyChanged>? _headerAndBodyToolViewItems;
     private ReadOnlyObservableCollection<INotifyPropertyChanged>? _headerAndBodyToolViewItemsReadOnly;
@@ -250,15 +251,60 @@ public sealed partial class GuiToolProvider
     }
 
     /// <summary>
-    /// Gets all the <see cref="GuiToolViewItem"/> the given <paramref name="guiToolInstance"/> appears in.
+    /// Gets the first <see cref="GuiToolViewItem"/> or <see cref="GroupViewItem"/> the given <paramref name="internalComponentName"/> appears in.
     /// </summary>
-    public IEnumerable<GuiToolViewItem> GetViewItemFromTool(GuiToolInstance guiToolInstance)
+    public INotifyPropertyChanged? GetViewItemFromInternalComponentName(string internalComponentName)
+    {
+        for (int i = 0; i < FooterToolViewItems.Count; i++)
+        {
+            if (string.Equals(FooterToolViewItems[i].ToolInstance.InternalComponentName, internalComponentName, StringComparison.Ordinal))
+            {
+                return FooterToolViewItems[i];
+            }
+        }
+
+        for (int i = 0; i < HeaderAndBodyToolViewItems.Count; i++)
+        {
+            INotifyPropertyChanged item = HeaderAndBodyToolViewItems[i];
+            if (item is GuiToolViewItem guiToolViewItem
+                && string.Equals(guiToolViewItem.ToolInstance.InternalComponentName, internalComponentName, StringComparison.Ordinal))
+            {
+                return guiToolViewItem;
+            }
+            else if (item is GroupViewItem groupViewItem)
+            {
+                if (string.Equals(groupViewItem.InternalName, internalComponentName, StringComparison.Ordinal))
+                {
+                    return groupViewItem;
+                }
+
+                if (groupViewItem.Children is not null)
+                {
+                    for (int j = 0; j < groupViewItem.Children.Count; j++)
+                    {
+                        GuiToolViewItem subGuiToolViewItem = groupViewItem.Children[j];
+                        if (string.Equals(subGuiToolViewItem.ToolInstance.InternalComponentName, internalComponentName, StringComparison.Ordinal))
+                        {
+                            return subGuiToolViewItem;
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Gets the first <see cref="GuiToolViewItem"/> the given <paramref name="guiToolInstance"/> appears in.
+    /// </summary>
+    public GuiToolViewItem? GetViewItemFromTool(GuiToolInstance guiToolInstance)
     {
         for (int i = 0; i < FooterToolViewItems.Count; i++)
         {
             if (FooterToolViewItems[i].ToolInstance == guiToolInstance)
             {
-                yield return FooterToolViewItems[i];
+                return FooterToolViewItems[i];
             }
         }
 
@@ -267,7 +313,7 @@ public sealed partial class GuiToolProvider
             INotifyPropertyChanged item = HeaderAndBodyToolViewItems[i];
             if (item is GuiToolViewItem guiToolViewItem && guiToolViewItem.ToolInstance == guiToolInstance)
             {
-                yield return guiToolViewItem;
+                return guiToolViewItem;
             }
             else if (item is GroupViewItem groupViewItem && groupViewItem.Children is not null)
             {
@@ -276,11 +322,13 @@ public sealed partial class GuiToolProvider
                     GuiToolViewItem subGuiToolViewItem = groupViewItem.Children[j];
                     if (subGuiToolViewItem.ToolInstance == guiToolInstance)
                     {
-                        yield return subGuiToolViewItem;
+                        return subGuiToolViewItem;
                     }
                 }
             }
         }
+
+        return null;
     }
 
     public void ForEachToolViewItem(Action<GuiToolViewItem> action)

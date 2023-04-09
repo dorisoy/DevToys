@@ -114,9 +114,25 @@ internal sealed class SampleGuiTool2 : IGuiTool
 [TargetPlatform(Platform.WASM)]
 internal sealed class SampleGuiTool3 : IGuiTool
 {
-    public IUIElement View => null!;
+    private readonly IUIButton _button = Button();
+
+    public IUIElement View => _button.Text("Hello there").OnClick(OnButtonClickAsync);
 
     public void OnDataReceived(string dataTypeName, object? parsedData) { }
+
+    private ValueTask OnButtonClickAsync()
+    {
+        if (_button.Text == "Hello there")
+        {
+            _button.Text("Next time you click, I will disappear!");
+        }
+        else
+        {
+            _button.Hide();
+        }
+
+        return ValueTask.CompletedTask;
+    }
 }
 
 [Export(typeof(IGuiTool))]
