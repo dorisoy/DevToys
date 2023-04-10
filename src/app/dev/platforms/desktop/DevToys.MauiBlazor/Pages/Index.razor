@@ -11,7 +11,10 @@
 
 <h1>@Name - (@EncodedName)</h1>
 
-<UIElementPresenter UIElement="@UIElement" />
+@if (UIElement is not null)
+{
+    <UIElementPresenter UIElement="@UIElement" />
+}
 
 @code {
     [Inject]
@@ -57,6 +60,8 @@
 
     protected override void OnParametersSet()
     {
+        Task.Run(() => GC.Collect());
+
         var guiToolProvider = MefProvider.Import<GuiToolProvider>();
         var viewItem = guiToolProvider.GetViewItemFromInternalComponentName(Name);
 
@@ -66,7 +71,9 @@
         }
         else if (viewItem is GroupViewItem groupViewItem)
         {
-            // TODO.
+            // Setting to null makes Blazor disposing the content
+            // of UIElementPresenter automatically, which is GREAT !
+            UIElement = null;
         }
 
         base.OnParametersSet();

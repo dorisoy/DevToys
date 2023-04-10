@@ -7,6 +7,9 @@
     {
         switch (UIElement)
         {
+            case IUIStack stack:
+                <UIStackPresenter UIStack="@stack" />
+                break;
             case IUIButton button:
                 <UIButtonPresenter UIButton="@button" />
                 break;

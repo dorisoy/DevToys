@@ -1,0 +1,13 @@
+﻿@namespace DevToys.MauiBlazor.Components.GuiTool
+@using DevToys.Api;
+@inherits MefLayoutComponentBase
+
+<CascadingValue Value="this" IsFixed="true">
+    @if (UIStack is not null && UIStack.IsVisible)
+    {
+        foreach (var item in UIStack.Children)
+        {
+            <UIElementPresenter UIElement="@item"/>
+        }
+    }
+</CascadingValue>

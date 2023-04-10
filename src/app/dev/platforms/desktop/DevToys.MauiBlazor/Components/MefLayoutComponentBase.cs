@@ -4,7 +4,7 @@ using Microsoft.Fast.Components.FluentUI;
 
 namespace DevToys.MauiBlazor.Components;
 
-public abstract class MefLayoutComponentBase : LayoutComponentBase
+public abstract class MefLayoutComponentBase : LayoutComponentBase, IDisposable
 {
     protected HashSet<string> Classess = new();
 
@@ -53,5 +53,9 @@ public abstract class MefLayoutComponentBase : LayoutComponentBase
     protected virtual void AppendClasses(ClassHelper helper)
     {
         helper.Append(Classess);
+    }
+
+    public virtual void Dispose()
+    {
     }
 }
