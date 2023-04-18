@@ -1,0 +1,12 @@
+﻿@namespace DevToys.MauiBlazor.Components.GuiTool
+@using DevToys.Api;
+@inherits MefLayoutComponentBase
+
+<CascadingValue Value="this" IsFixed="true">
+    @if (UIButton is not null && UIButton.IsVisible)
+    {
+        <Button Type="ButtonType.Button" Appearance="ButtonAppearance.Filled" @onclick=OnButtonClickAsync>
+            @UIButton?.Text
+        </Button>
+    }
+</CascadingValue>

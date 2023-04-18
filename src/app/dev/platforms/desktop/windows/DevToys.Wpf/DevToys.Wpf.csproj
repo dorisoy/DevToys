@@ -1,0 +1,56 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>$(NetCoreWindows)</TargetFramework>
+    <TargetPlatformMinVersion>7.0</TargetPlatformMinVersion>
+    <UseWPF>true</UseWPF>
+    <SelfContained>true</SelfContained>
+    <RootNamespace>DevToys.MauiBlazor</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- TypeScript -->
+    <ConfigFiles Include="tsconfig.json" />
+    <Content Update="tsconfig.json" PublishFolderType="None" />
+    <Content Update="package.json" PublishFolderType="None" ExcludeFromBundleResources="true"/>
+    <TypeScriptCompile Remove="**\*.ts" />
+    <None Include="**\*.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\..\..\DevToys.MonacoEditor\monaco-editor\*" LinkBase="wwwroot\lib\monaco-editor\%(RecursiveDir)/%(Filename)%(Extension)" />
+    <Content Include="..\..\..\..\DevToys.MonacoEditor\monaco-editor\min\**\*" Link="wwwroot\lib\monaco-editor\min\%(RecursiveDir)/%(Filename)%(Extension)" />
+    <None Remove="node_modules\**" />
+    <TypeScriptCompile Remove="node_modules\**" />
+    <TypeScriptCompile Remove="wwwroot\lib\monaco-editor\**\*.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\fonts\FluentSystemIcons-Regular.woff2" />
+    <None Include="wwwroot\js\breakpoint.js" />
+    <None Include="wwwroot\js\devtoys.js" />
+    <None Include="wwwroot\js\require.js" />
+    <None Include="wwwroot\js\web-components.min.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\DevToys.Api\DevToys.Api.csproj" />
+    <ProjectReference Include="..\..\..\..\DevToys.Core\DevToys.Core.csproj" />
+    <ProjectReference Include="..\..\..\..\DevToys.Business\DevToys.Business.csproj" />
+    <ProjectReference Include="..\..\..\..\DevToys.Localization\DevToys.Localization.csproj" />
+    <ProjectReference Include="..\..\..\..\DevToys.Tools\DevToys.Tools.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MicaWPF" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" />
+    <PackageReference Include="Microsoft.Fast.Components.FluentUI" />
+    <PackageReference Include="Microsoft.TypeScript.MSBuild">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="SixLabors.ImageSharp"/>
+  </ItemGroup>
+</Project>

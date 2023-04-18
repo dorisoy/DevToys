@@ -5,3 +5,4 @@
 [assembly: InternalsVisibleTo("DevToys.Wasdk")]
 [assembly: InternalsVisibleTo("DevToys.MacOS")]
 [assembly: InternalsVisibleTo("DevToys.Wasm")]
+[assembly: InternalsVisibleTo("DevToys.Wpf")]

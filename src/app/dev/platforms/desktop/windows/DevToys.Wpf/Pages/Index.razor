@@ -1,0 +1,81 @@
+﻿@page "/"
+@page "/{Name}"
+
+@using DevToys.Api;
+@using DevToys.Business.ViewModels;
+@using DevToys.Core.Tools;
+@using DevToys.Core.Tools.ViewItems;
+@using DevToys.MauiBlazor.Components.GuiTool;
+@using Microsoft.Fast.Components.FluentUI
+@using System.Web;
+
+<h1>@Name - (@EncodedName)</h1>
+
+@if (UIElement is not null)
+{
+    <UIElementPresenter UIElement="@UIElement" />
+}
+
+@code {
+    [Inject]
+    internal IMefProvider MefProvider { get; set; } = default!;
+
+    private string _name = string.Empty;
+    private string _encodedName = string.Empty;
+
+    public string EncodedName
+    {
+        get => _encodedName;
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                _encodedName = string.Empty;
+                return;
+            }
+            _encodedName = value;
+        }
+    }
+
+    // Define a property to contain the parameter passed from the auth page
+    [Parameter]
+    public string Name
+    {
+        get => _name;
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                EncodedName = string.Empty;
+                _name = string.Empty;
+                return;
+            }
+            Guard.IsNotNullOrWhiteSpace(value);
+            EncodedName = value;
+            _name = HttpUtility.UrlDecode(value);
+        }
+    }
+
+    public IUIElement? UIElement { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        Task.Run(() => GC.Collect());
+
+        var guiToolProvider = MefProvider.Import<GuiToolProvider>();
+        var viewItem = guiToolProvider.GetViewItemFromInternalComponentName(Name);
+
+        if (viewItem is GuiToolViewItem guiToolViewItem)
+        {
+            UIElement = guiToolViewItem.ToolInstance.View;
+        }
+        else if (viewItem is GroupViewItem groupViewItem)
+        {
+            // Setting to null makes Blazor disposing the content
+            // of UIElementPresenter automatically, which is GREAT !
+            UIElement = null;
+        }
+
+        base.OnParametersSet();
+    }
+}

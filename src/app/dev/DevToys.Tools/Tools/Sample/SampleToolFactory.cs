@@ -122,7 +122,7 @@ internal sealed class SampleGuiTool3 : IGuiTool
     {
         var buttons = new List<IUIButton>();
         buttons.Add(Button().Text("Click this button to hide everything for a perf test.").OnClick(OnButtonClickAsync));
-        for (var i = 0; i < 10_000; i++)
+        for (var i = 0; i < 100; i++)
         {
             buttons.Add(Button().Text("Button " + i));
         }
